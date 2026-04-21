@@ -173,7 +173,8 @@ function addExpense() {
       type,
       description: desc,
       amount: val,
-      date: new Date().toISOString()
+      createdDate: new Date().toISOString(),
+      editedDate: null
     });
 
     saveData();
@@ -191,7 +192,8 @@ function addSale() {
       type,
       description: desc,
       amount: val,
-      date: new Date().toISOString()
+      createdDate: new Date().toISOString(),
+      editedDate: null
     });
 
     saveData();
@@ -212,21 +214,51 @@ function deleteSale(index) {
 }
 
 function editExpense(index) {
-  let newVal = prompt("Edit amount:", expenses[index].amount);
-  if (newVal !== null && !isNaN(parseFloat(newVal))) {
-    expenses[index].amount = parseFloat(newVal);
-    saveData();
-    render();
-  }
+  let item = expenses[index];
+
+  let newType = prompt("Edit type:", item.type);
+  if (newType === null) return;
+
+  let newDesc = prompt("Edit description:", item.description);
+  if (newDesc === null) return;
+
+  let newAmount = prompt("Edit amount:", item.amount);
+  if (newAmount === null || isNaN(parseFloat(newAmount))) return;
+
+  expenses[index] = {
+    ...item,
+    type: newType,
+    description: newDesc,
+    amount: parseFloat(newAmount),
+    editedDate: new Date().toISOString()
+  };
+
+  saveData();
+  render();
 }
 
 function editSale(index) {
-  let newVal = prompt("Edit amount:", sales[index].amount);
-  if (newVal !== null && !isNaN(parseFloat(newVal))) {
-    sales[index].amount = parseFloat(newVal);
-    saveData();
-    render();
-  }
+  let item = sales[index];
+
+  let newType = prompt("Edit type:", item.type);
+  if (newType === null) return;
+
+  let newDesc = prompt("Edit description:", item.description);
+  if (newDesc === null) return;
+
+  let newAmount = prompt("Edit amount:", item.amount);
+  if (newAmount === null || isNaN(parseFloat(newAmount))) return;
+
+  sales[index] = {
+    ...item,
+    type: newType,
+    description: newDesc,
+    amount: parseFloat(newAmount),
+    editedDate: new Date().toISOString()
+  };
+
+  saveData();
+  render();
 }
 
 function exportCSV() {
@@ -324,7 +356,8 @@ function render() {
             <strong>${e.type}</strong><br>
             ${e.description ? e.description + "<br>" : ""}
             ${formatMoney(e.amount)} 
-            <br><small>${formatDate(e.date)}</small><br>
+            <small>Created: ${formatDate(e.createdDate)}</small><br>
+            ${e.editedDate ? `<small>Edited: ${formatDate(e.editedDate)}</small>` : ""}
             <button class="action-btn" onclick="editExpense(${expenses.length - 1 - i})">Edit</button>
             <button class="action-btn" onclick="deleteExpense(${expenses.length - 1 - i})">Delete</button>
           </div>
@@ -350,7 +383,8 @@ function render() {
             <strong>${s.type}</strong><br>
             ${s.description ? s.description + "<br>" : ""}
             ${formatMoney(s.amount)}
-            <br><small>${formatDate(s.date)}</small><br>
+            <small>Created: ${formatDate(e.createdDate)}</small><br>
+            ${e.editedDate ? `<small>Edited: ${formatDate(e.editedDate)}</small>` : ""}
             <button class="action-btn" onclick="editSale(${sales.length - 1 - i})">Edit</button>
             <button class="action-btn" onclick="deleteSale(${sales.length - 1 - i})">Delete</button>
           </div>
