@@ -164,9 +164,18 @@ function setTab(tab) {
 }
 
 function addExpense() {
+  let type = document.getElementById("expenseType").value;
+  let desc = document.getElementById("expenseDesc").value;
   let val = parseFloat(document.getElementById("expenseInput").value);
-  if (!isNaN(val)) {
-    expenses.push({ amount: val, date: new Date().toISOString() });
+
+  if (!isNaN(val) && type.trim() !== "") {
+    expenses.push({
+      type,
+      description: desc,
+      amount: val,
+      date: new Date().toISOString()
+    });
+
     saveData();
     render();
   }
@@ -294,13 +303,17 @@ function render() {
       <h1>Expenses</h1>
 
       <div class="card">
-        <input id="expenseInput" placeholder="Enter amount">
+        <input id="expenseType" placeholder="Type (e.g. Food, Gas)">
+        <input id="expenseDesc" placeholder="Description">
+        <input id="expenseInput" placeholder="Amount">
         <button class="action-btn" onclick="addExpense()">Add Expense</button>
       </div>
 
       <div class="card">
         ${expenses.slice().reverse().map((e, i) => `
           <div class="list-item red">
+            <strong>${e.type}</strong><br>
+            ${e.description ? e.description + "<br>" : ""}
             ${formatMoney(e.amount)} 
             <br><small>${formatDate(e.date)}</small><br>
             <button class="action-btn" onclick="editExpense(${expenses.length - 1 - i})">Edit</button>
