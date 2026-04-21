@@ -86,7 +86,7 @@ input {
   color: white;
 }
 
-button {
+.action-btn {
   width: 100%;
   margin-top: 10px;
   padding: 12px;
@@ -271,7 +271,7 @@ function render() {
       </div>
 
       <div class="card">
-        <button onclick="exportCSV()">Export CSV</button>
+        <button class="action-btn" onclick="exportCSV()">Export CSV</button>
       </div>
     `;
   }
@@ -282,7 +282,7 @@ function render() {
 
       <div class="card">
         <input id="expenseInput" placeholder="Enter amount">
-        <button onclick="addExpense()">Add Expense</button>
+        <button class="action-btn" onclick="addExpense()">Add Expense</button>
       </div>
 
       <div class="card">
@@ -290,8 +290,8 @@ function render() {
           <div class="list-item red">
             ${formatMoney(e.amount)} 
             <br><small>${formatDate(e.date)}</small><br>
-            <button onclick="editExpense(${expenses.length - 1 - i})">Edit</button>
-            <button onclick="deleteExpense(${expenses.length - 1 - i})">Delete</button>
+            <button class="action-btn" onclick="editExpense(${expenses.length - 1 - i})">Edit</button>
+            <button class="action-btn" onclick="deleteExpense(${expenses.length - 1 - i})">Delete</button>
           </div>
         `).join("")}
       </div>
@@ -304,7 +304,7 @@ function render() {
 
       <div class="card">
         <input id="saleInput" placeholder="Enter amount">
-        <button onclick="addSale()">Add Sale</button>
+        <button class="action-btn" onclick="addSale()">Add Sale</button>
       </div>
 
       <div class="card">
@@ -312,8 +312,8 @@ function render() {
           <div class="list-item green">
             ${formatMoney(s.amount)} 
             <br><small>${formatDate(s.date)}</small><br>
-            <button onclick="editSale(${sales.length - 1 - i})">Edit</button>
-            <button onclick="deleteSale(${sales.length - 1 - i})">Delete</button>
+            <button class="action-btn" onclick="editSale(${sales.length - 1 - i})">Edit</button>
+            <button class="action-btn" onclick="deleteSale(${sales.length - 1 - i})">Delete</button>
           </div>
         `).join("")}
       </div>
