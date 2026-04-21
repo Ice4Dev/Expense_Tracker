@@ -182,9 +182,18 @@ function addExpense() {
 }
 
 function addSale() {
+  let type = document.getElementById("saleType").value;
+  let desc = document.getElementById("saleDesc").value;
   let val = parseFloat(document.getElementById("saleInput").value);
-  if (!isNaN(val)) {
-    sales.push({ amount: val, date: new Date().toISOString() });
+
+  if (!isNaN(val) && type.trim() !== "") {
+    sales.push({
+      type,
+      description: desc,
+      amount: val,
+      date: new Date().toISOString()
+    });
+
     saveData();
     render();
   }
@@ -329,14 +338,18 @@ function render() {
       <h1>Sales</h1>
 
       <div class="card">
-        <input id="saleInput" placeholder="Enter amount">
+        <input id="saleType" placeholder="Type (e.g. Bundle, Etsy, Whatnot)">
+        <input id="saleDesc" placeholder="Description">
+        <input id="saleInput" placeholder="Amount">
         <button class="action-btn" onclick="addSale()">Add Sale</button>
       </div>
 
       <div class="card">
         ${sales.slice().reverse().map((s, i) => `
           <div class="list-item green">
-            ${formatMoney(s.amount)} 
+            <strong>${s.type}</strong><br>
+            ${s.description ? s.description + "<br>" : ""}
+            ${formatMoney(s.amount)}
             <br><small>${formatDate(s.date)}</small><br>
             <button class="action-btn" onclick="editSale(${sales.length - 1 - i})">Edit</button>
             <button class="action-btn" onclick="deleteSale(${sales.length - 1 - i})">Delete</button>
