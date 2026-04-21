@@ -357,7 +357,7 @@ function render() {
           <div class="list-item red">
             <strong>${e.type}</strong><br>
             ${e.description ? e.description + "<br>" : ""}
-            ${formatMoney(e.amount)} 
+            ${formatMoney(e.amount)}<br>
             <small>Created: ${formatDate(e.createdDate)}</small><br>
             ${e.editedDate ? `<small>Edited: ${formatDate(e.editedDate)}</small>` : ""}
             <button class="action-btn" onclick="editExpense(${expenses.length - 1 - i})">Edit</button>
@@ -384,7 +384,7 @@ function render() {
           <div class="list-item green">
             <strong>${s.type}</strong><br>
             ${s.description ? s.description + "<br>" : ""}
-            ${formatMoney(s.amount)}
+            ${formatMoney(s.amount)}<br>
             <small>Created: ${formatDate(s.createdDate)}</small><br>
             ${s.editedDate ? `<small>Edited: ${formatDate(s.editedDate)}</small>` : ""}
             <button class="action-btn" onclick="editSale(${sales.length - 1 - i})">Edit</button>
