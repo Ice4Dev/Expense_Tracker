@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thrift Tracker</title>
+
+<style>
+:root {
+  --bg: #0d0d0d;
+  --card: #1a1a1a;
+  --accent: #7c3aed;
+  --green: #22c55e;
+  --red: #ef4444;
+  --text: #e5e5e5;
+  --subtext: #888;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  padding: 20px;
+  padding-bottom: 80px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.stat-grid {
+  display: flex;
+  gap: 10px;
+}
+
+.stat {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  background: #111;
+}
+
+.stat h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--subtext);
+}
+
+.stat p {
+  margin: 5px 0 0;
+  font-size: 18px;
+}
+
+.green { color: var(--green); }
+.red { color: var(--red); }
+.purple { color: var(--accent); }
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 10px;
+  background: #111;
+  color: white;
+}
+
+button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-weight: bold;
+}
+
+.list-item {
+  padding: 10px;
+  border-bottom: 1px solid #222;
+}
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background: #111;
+  border-top: 1px solid #222;
+}
+
+.nav button {
+  flex: 1;
+  background: none;
+  color: var(--subtext);
+}
+
+.nav button.active {
+  color: var(--accent);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="app"></div>
+
+<div class="nav">
+  <button onclick="setTab('dashboard')" id="tab-dashboard">Dashboard</button>
+  <button onclick="setTab('expenses')" id="tab-expenses">Expenses</button>
+  <button onclick="setTab('sales')" id="tab-sales">Sales</button>
+</div>
+
+<script>
+let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+let sales = JSON.parse(localStorage.getItem("sales")) || [];
+
+let currentTab = "dashboard";
+let selectedMonth = new Date().toISOString().slice(0,7);
+
+function saveData() {
+  localStorage.setItem("expenses", JSON.stringify(expenses));
+  localStorage.setItem("sales", JSON.stringify(sales));
+}
+
+function setTab(tab) {
+  currentTab = tab;
+  render();
+}
+
+function addExpense() {
+  let val = parseFloat(document.getElementById("expenseInput").value);
+  if (!isNaN(val)) {
+    expenses.push({ amount: val, date: new Date().toISOString() });
+    saveData();
+    render();
+  }
+}
+
+function addSale() {
+  let val = parseFloat(document.getElementById("saleInput").value);
+  if (!isNaN(val)) {
+    sales.push({ amount: val, date: new Date().toISOString() });
+    saveData();
+    render();
+  }
+}
+
+function deleteExpense(index) {
+  expenses.splice(index, 1);
+  saveData();
+  render();
+}
+
+function deleteSale(index) {
+  sales.splice(index, 1);
+  saveData();
+  render();
+}
+
+function editExpense(index) {
+  let newVal = prompt("Edit amount:", expenses[index].amount);
+  if (newVal !== null && !isNaN(parseFloat(newVal))) {
+    expenses[index].amount = parseFloat(newVal);
+    saveData();
+    render();
+  }
+}
+
+function editSale(index) {
+  let newVal = prompt("Edit amount:", sales[index].amount);
+  if (newVal !== null && !isNaN(parseFloat(newVal))) {
+    sales[index].amount = parseFloat(newVal);
+    saveData();
+    render();
+  }
+}
+
+function exportCSV() {
+  let rows = [["Type","Amount","Date"]];
+
+  expenses.forEach(e => {
+    rows.push(["Expense", e.amount, e.date]);
+  });
+
+  sales.forEach(s => {
+    rows.push(["Sale", s.amount, s.date]);
+  });
+
+  let csvContent = rows.map(r => r.join(",")).join("\n");
+
+  let blob = new Blob([csvContent], { type: "text/csv" });
+  let url = URL.createObjectURL(blob);
+
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "thrift_data.csv";
+  a.click();
+}
+
+function formatMoney(num) {
+  return "$" + num.toFixed(2);
+}
+
+function formatDate(date) {
+  return new Date(date).toLocaleDateString();
+}
+
+function filterByMonth(data) {
+  return data.filter(item => item.date.startsWith(selectedMonth));
+}
+
+function render() {
+  let app = document.getElementById("app");
+
+  let monthlyExpenses = filterByMonth(expenses);
+  let monthlySales = filterByMonth(sales);
+
+  let totalExpenses = monthlyExpenses.reduce((a,b)=>a+b.amount,0);
+  let totalSales = monthlySales.reduce((a,b)=>a+b.amount,0);
+  let profit = totalSales - totalExpenses;
+
+  document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + currentTab).classList.add("active");
+
+  if (currentTab === "dashboard") {
+    app.innerHTML = `
+      <h1>Dashboard</h1>
+
+      <div class="card">
+        <label>Select Month</label>
+        <input type="month" value="${selectedMonth}" onchange="selectedMonth=this.value; render();">
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <h3>Revenue</h3>
+          <p class="green">${formatMoney(totalSales)}</p>
+        </div>
+        <div class="stat">
+          <h3>Expenses</h3>
+          <p class="red">${formatMoney(totalExpenses)}</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Net Profit</h3>
+        <p class="purple">${formatMoney(profit)}</p>
+      </div>
+
+      <div class="card">
+        <button onclick="exportCSV()">Export CSV</button>
+      </div>
+    `;
+  }
+
+  if (currentTab === "expenses") {
+    app.innerHTML = `
+      <h1>Expenses</h1>
+
+      <div class="card">
+        <input id="expenseInput" placeholder="Enter amount">
+        <button onclick="addExpense()">Add Expense</button>
+      </div>
+
+      <div class="card">
+        ${expenses.slice().reverse().map((e, i) => `
+          <div class="list-item red">
+            ${formatMoney(e.amount)} 
+            <br><small>${formatDate(e.date)}</small><br>
+            <button onclick="editExpense(${expenses.length - 1 - i})">Edit</button>
+            <button onclick="deleteExpense(${expenses.length - 1 - i})">Delete</button>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  if (currentTab === "sales") {
+    app.innerHTML = `
+      <h1>Sales</h1>
+
+      <div class="card">
+        <input id="saleInput" placeholder="Enter amount">
+        <button onclick="addSale()">Add Sale</button>
+      </div>
+
+      <div class="card">
+        ${sales.slice().reverse().map((s, i) => `
+          <div class="list-item green">
+            ${formatMoney(s.amount)} 
+            <br><small>${formatDate(s.date)}</small><br>
+            <button onclick="editSale(${sales.length - 1 - i})">Edit</button>
+            <button onclick="deleteSale(${sales.length - 1 - i})">Delete</button>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+}
+
+render();
+</script>
+
+</body>
+</html>
