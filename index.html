@@ -98,7 +98,7 @@ button {
 
 .nav {
   position: fixed;
-  bottom: 0;
+  bottom: calc(12px + env(safe-area-inset-bottom));
   width: 100%;
   display: flex;
   background: #111;
@@ -107,8 +107,8 @@ button {
 
 .nav button {
   flex: 1;
-  background: none;
-  color: var(--subtext);
+  padding: 14px 0;
+  font-size: 16px;
 }
 
 .nav button.active {
